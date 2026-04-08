@@ -6,6 +6,7 @@ namespace spydle_api
 {
     public class ApplicationDbContext : DbContext
     {
+        public DbSet<Case> Cases { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
