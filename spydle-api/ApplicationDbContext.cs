@@ -1,0 +1,14 @@
+﻿using Microsoft.EntityFrameworkCore;
+using spydle_api.Models;
+using System.Reflection.Metadata;
+
+namespace spydle_api
+{
+    public class ApplicationDbContext : DbContext
+    {
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+    }
+}
