@@ -5,7 +5,7 @@ namespace spydle_api.Models
     public class Case
     {
         [Key]
-        public DateTime Date;
-        public string RngSeed = null!;
+        public DateTime Date { get; set; }
+        public string RngSeed { get; set; } = null!;
     }
 }

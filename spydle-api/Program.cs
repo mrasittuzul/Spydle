@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using spydle_api;
+using spydle_api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
