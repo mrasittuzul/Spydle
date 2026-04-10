@@ -6,6 +6,7 @@ namespace spydle_api.Models
     {
         [Key]
         public DateTime Date { get; set; }
-        public string RngSeed { get; set; } = null!;
+        public int RngSeed { get; set; }
+        public int CharacterCode { get; set; }
     }
 }
