@@ -2,7 +2,7 @@
 using spydle_api.Models;
 using System.Reflection.Metadata;
 
-namespace spydle_api
+namespace spydle_api.Data
 {
     public class ApplicationDbContext : DbContext
     {
