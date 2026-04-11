@@ -18,6 +18,29 @@ namespace spydle_api.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            List<Character> characters = new List<Character>(64);
+            int characterCode = 0;
+            for (int eyeColor = 0; eyeColor < 4; eyeColor++)
+            {
+                for (int skinColor = 0; skinColor < 4; skinColor++)
+                {
+                    for (int age = 0; age < 2; age++)
+                    {
+                        for (int sex = 0; sex < 2; sex++)
+                        {
+                            characterCode = 0;
+                            characterCode |= eyeColor << 4;
+                            characterCode |= skinColor << 2;
+                            characterCode |= age << 1;
+                            characterCode |= sex;
+                            characters.Add(new Character { Code = characterCode, IsActive = true });
+                        }
+                    }
+                }
+            }
+            modelBuilder.Entity<Character>(b => b.HasData(characters));
+
             modelBuilder.Entity<CharacterEyeColor>(b =>
             {
                 b.HasData(
