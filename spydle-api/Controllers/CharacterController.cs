@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
 using spydle_api.DTOs;
+using spydle_api.Mappers;
 using spydle_api.Services;
 
 namespace spydle_api.Controllers
@@ -21,14 +22,14 @@ namespace spydle_api.Controllers
         [HttpGet("EyeColors")]
         public async Task<IActionResult> GetEyeColors()
         {
-            var eyeColors = _context.CharacterEyeColors.Select(c => new EyeColorDTO { Id = c.Id, Red = c.Red, Green = c.Green, Blue = c.Blue }).ToListAsync();
+            var eyeColors = _context.CharacterEyeColors.Select(c => c.ToEyeColorDTO()).ToListAsync();
             return Ok(eyeColors);
         }
 
         [HttpGet("SkinColors")]
         public async Task<IActionResult> GetSkinColors()
         {
-            var skinColors = _context.CharacterSkinColors.Select(c => new SkinColorDTO { Id = c.Id, Red = c.Red, Green = c.Green, Blue = c.Blue }).ToListAsync();
+            var skinColors = _context.CharacterSkinColors.Select(c => c.ToSkinColorDTO()).ToListAsync();
             return Ok(skinColors);
         }
 
