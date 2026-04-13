@@ -1,0 +1,1 @@
+export var BASE_API_URL: string = "https://localhost:5243";
