@@ -20,20 +20,23 @@ namespace spydle_api.Controllers
         }
 
         [HttpGet("EyeColors")]
+        [Produces<EyeColorDTO[]>]
         public async Task<IActionResult> GetEyeColors()
         {
-            var eyeColors = _context.CharacterEyeColors.Select(c => c.ToEyeColorDTO()).ToListAsync();
+            var eyeColors = await _context.CharacterEyeColors.Select(c => c.ToEyeColorDTO()).ToArrayAsync();
             return Ok(eyeColors);
         }
 
         [HttpGet("SkinColors")]
+        [Produces<SkinColorDTO[]>]
         public async Task<IActionResult> GetSkinColors()
         {
-            var skinColors = _context.CharacterSkinColors.Select(c => c.ToSkinColorDTO()).ToListAsync();
+            var skinColors = await _context.CharacterSkinColors.Select(c => c.ToSkinColorDTO()).ToArrayAsync();
             return Ok(skinColors);
         }
 
         [HttpPost("CheckSuspects")]
+
         public async Task<IActionResult> CheckSuspectsForTraits([FromBody] SuspectsDTO suspectsDTO)
         {
             if(CaseController.TodaysCase == null)
