@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
 using spydle_api.DTOs;
@@ -21,6 +22,7 @@ namespace spydle_api.Controllers
         }
 
         [HttpGet("Today")]
+        [Authorize]
         public async Task<IActionResult> GetTodaysCase()
         {
             await PrepareTodaysCase();

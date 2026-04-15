@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
@@ -21,6 +22,7 @@ namespace spydle_api.Controllers
 
         [HttpGet("EyeColors")]
         [Produces<EyeColorDTO[]>]
+        [Authorize]
         public async Task<IActionResult> GetEyeColors()
         {
             var eyeColors = await _context.CharacterEyeColors.Select(c => c.ToEyeColorDTO()).ToArrayAsync();
@@ -29,6 +31,7 @@ namespace spydle_api.Controllers
 
         [HttpGet("SkinColors")]
         [Produces<SkinColorDTO[]>]
+        [Authorize]
         public async Task<IActionResult> GetSkinColors()
         {
             var skinColors = await _context.CharacterSkinColors.Select(c => c.ToSkinColorDTO()).ToArrayAsync();
@@ -36,7 +39,7 @@ namespace spydle_api.Controllers
         }
 
         [HttpPost("CheckSuspects")]
-
+        [Authorize]
         public async Task<IActionResult> CheckSuspectsForTraits([FromBody] SuspectsDTO suspectsDTO)
         {
             if(CaseController.TodaysCase == null)
