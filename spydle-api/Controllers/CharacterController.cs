@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
 using spydle_api.DTOs;
 using spydle_api.Mappers;
+using spydle_api.Models;
 using spydle_api.Services;
 
 namespace spydle_api.Controllers
@@ -44,7 +45,7 @@ namespace spydle_api.Controllers
         {
             if(CaseController.TodaysCase == null)
             {
-                return BadRequest(new { error = "Today's case hasn't been generated yet." });
+                return BadRequest(new ErrorContainer("Today's case hasn't been generated yet.").ToJson());
             }
 
             for (int i = 0; i < suspectsDTO.SuspectCodes.Length; i++)

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using spydle_api.Interfaces;
+using spydle_api.Mappers;
 using spydle_api.Models;
 
 namespace spydle_api.Controllers
@@ -26,7 +27,7 @@ namespace spydle_api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { error = "Invalid request" });
+                return BadRequest(new ErrorContainer("Invalid request").ToJson());
             }
 
             var user = await _userManager.FindByEmailAsync(registerRequest.Email);
@@ -43,11 +44,11 @@ namespace spydle_api.Controllers
                     var token = _tokenService.GenerateToken(registeringUser);
                     return Ok(token.Result);
                 }
-                return StatusCode(500, new { errors = result.Errors });
+                return StatusCode(500, new ErrorContainer(result.Errors.Select(identityError => identityError.Description).ToArray()).ToJson());
             }
             else
             {
-                return BadRequest(new { error = "A user with the same email address is already registered." });
+                return BadRequest(new ErrorContainer("A user with the same email address is already registered.").ToJson());
             }
         }
 
@@ -56,17 +57,22 @@ namespace spydle_api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { error = "Invalid request" });
+                return BadRequest(new ErrorContainer(ModelState.ToErrorCollection()).ToJson());
             }
 
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            if (user == null)
+            {
+                return BadRequest(new ErrorContainer("Incorrect email or password.").ToJson());
+            }
+
             var signInResult = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, false, true);
             if (signInResult.Succeeded)
             {
                 var token = await _tokenService.GenerateToken(user);
                 return Ok(token);
             }
-            return BadRequest("Incorrect email or password.");
+            return BadRequest(new ErrorContainer("Incorrect email or password.").ToJson());
         }
     }
 }
