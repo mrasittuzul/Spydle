@@ -1,1 +1,1 @@
-export var BASE_API_URL: string = "https://localhost:5432";
+export var BASE_API_URL: string = "https://localhost:7124/api/";
