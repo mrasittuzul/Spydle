@@ -45,7 +45,7 @@ namespace spydle_api.Controllers
         {
             if(CaseController.TodaysCase == null)
             {
-                return BadRequest(new ErrorContainer("Today's case hasn't been generated yet.").ToJson());
+                return BadRequest(new ErrorContainer("Today's case hasn't been generated yet."));
             }
 
             for (int i = 0; i < suspectsDTO.SuspectCodes.Length; i++)
