@@ -1,15 +1,15 @@
 import { NavLink } from "react-router-dom";
+import { useAuthContext } from "../Contexts/AuthContext";
 
 export default function Header(){
-
-    const jwt = localStorage.getItem('jwt');
+    const { isAuthorized } = useAuthContext();
 
     return(
         <nav>
             <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>Home</NavLink>
             {
-                jwt ? <NavLink to="/Logout" className={({ isActive }) => isActive ? "active" : ""}>Log Out</NavLink>
-                    : <NavLink to="/Login" className={({ isActive }) => isActive ? "active" : ""}>Log In</NavLink>
+                isAuthorized ? <NavLink to="/Logout" className={({ isActive }) => isActive ? "active" : ""}>Log Out</NavLink>
+                             : <NavLink to="/Login" className={({ isActive }) => isActive ? "active" : ""}>Log In</NavLink>
             }
         </nav>
     );

@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useAuthContext } from "../Contexts/AuthContext";
 
 export default function LogoutPage(){
     const navigate = useNavigate();
+    const authContext = useAuthContext();
+    authContext.setIsAuthorized(false);
     localStorage.removeItem("jwt");
     localStorage.removeItem("jwtExpireDate");
     useEffect(() => {
