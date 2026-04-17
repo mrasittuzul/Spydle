@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 export default function LogoutPage(){
-    localStorage.removeItem("jwt");
     const navigate = useNavigate();
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("jwtExpireDate");
     useEffect(() => {
         var timer = setTimeout(() => navigate("/"), 1000);
         return () => {
