@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Post } from "../Helpers/RequestHelper";
 import type { ApiLoginResponse, ApiErrorResponse } from "../Helpers/RequestHelper";
 
@@ -7,6 +8,7 @@ export default function LoginPage(){
     const [loginErrors, setLoginErrors] = useState<string[]>();
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     console.log(loginErrors);
     async function onLoginButtonClicked(){
@@ -22,6 +24,7 @@ export default function LoginPage(){
             const loginResponse = response.data as ApiLoginResponse;
             localStorage.setItem("jwt", loginResponse.token);
             localStorage.setItem("jwtExpireDate", loginResponse.tokenExpireDate);
+            navigate("/");
 
         } else{
             setLoginErrors((response.data as ApiErrorResponse).errors)
