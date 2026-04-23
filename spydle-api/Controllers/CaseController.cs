@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
 using spydle_api.DTOs;
+using spydle_api.Mappers;
 using spydle_api.Models;
 using spydle_api.Services;
 
@@ -26,7 +27,7 @@ namespace spydle_api.Controllers
         public async Task<IActionResult> GetTodaysCase()
         {
             await PrepareTodaysCase();
-            return Ok(TodaysCase);
+            return Ok(TodaysCase.ToCaseDTO());
         }
 
         private async Task<Case> PrepareTodaysCase()
