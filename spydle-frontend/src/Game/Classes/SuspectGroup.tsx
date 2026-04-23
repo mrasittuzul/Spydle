@@ -23,7 +23,7 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
         const columnGap = 15;
         const baseCharacterTextureWidth = scene.textures.get("maleBase").getSourceImage().width;
         for(let i = 0; i < capacity; i++){
-            const character = new Character(scene, 0, (baseCharacterTextureWidth + columnGap) * i, 0);
+            const character = new Character(scene, 0, (baseCharacterTextureWidth + columnGap) * i, 0, false);
             character.setVisible(false);
             this.characters.push(character);
             containerElements.push(character);

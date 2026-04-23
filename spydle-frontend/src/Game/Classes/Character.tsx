@@ -17,9 +17,20 @@ export class Character extends Phaser.GameObjects.Container {
     outline!: Phaser.GameObjects.Image;
     container!: Phaser.GameObjects.Container;
 
-    constructor(scene: GameplayScene, code: number, x: number, y: number) {
+    constructor(scene: GameplayScene, code: number, x: number, y: number, interactable: boolean) {
         super(scene, x, y);
         this.scene = scene;
+
+        const baseTexture = this.scene.textures.get("maleBase").getSourceImage();
+        this.setSize(baseTexture.width, baseTexture.height);
+        if(interactable){
+            this.setInteractive(
+                new Phaser.Geom.Rectangle(baseTexture.width / 2, baseTexture.height / 2, baseTexture.width, baseTexture.height),
+                Phaser.Geom.Rectangle.Contains
+            );
+            this.on("pointerdown", this.onClicked);
+        }
+
         this.code = code;
         this.characterTraits = this.decodeCharacterTraitsFromCode(code);
         this.createContainer();
@@ -65,6 +76,10 @@ export class Character extends Phaser.GameObjects.Container {
         this.outlineColor = color;
         this.outline.setVisible(isVisible);
         this.outline.setTint(color.color);
+    }
+
+    onClicked(pointer: Phaser.Input.Pointer){
+        console.log({p: pointer, x: this.x, y: this.y})
     }
 }
 

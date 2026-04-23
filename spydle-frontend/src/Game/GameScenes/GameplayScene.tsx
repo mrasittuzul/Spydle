@@ -82,7 +82,7 @@ export default class GameplayScene extends Phaser.Scene {
         for(let i = 0; i < this.caseData.includedCharacters.length; i++){
             const posX = startingPosition.x + (i % columnCount) * (textureSize.width + columnGap);
             const posY = startingPosition.y + Math.floor(i / columnCount) * (textureSize.height + rowGap)
-            this.characters.push(new Character(this, this.caseData.includedCharacters[i], posX, posY));
+            this.characters.push(new Character(this, this.caseData.includedCharacters[i], posX, posY, true));
         }
     }
 
