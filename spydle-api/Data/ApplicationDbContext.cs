@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using spydle_api.Entities;
 using spydle_api.Models;
 using System.Reflection.Metadata;
 
@@ -8,6 +9,7 @@ namespace spydle_api.Data
     public class ApplicationDbContext : IdentityDbContext<User>
     {
         public DbSet<Case> Cases { get; set; }
+        public DbSet<Interrogation> Interrogations { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<CharacterEyeColor> CharacterEyeColors { get; set; }
         public DbSet<CharacterSkinColor> CharacterSkinColors { get; set; }
@@ -20,6 +22,19 @@ namespace spydle_api.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Interrogation>()
+                .HasOne<Case>(i => i.Case)
+                .WithMany(c => c.Interrogations)
+                .HasForeignKey(i => i.CaseDate);
+
+            modelBuilder.Entity<User>()
+                .HasMany<Interrogation>(u => u.Interrogations)
+                .WithOne(i => i.User)
+                .HasForeignKey(i => i.UserId);
+
+            modelBuilder.Entity<Interrogation>().ToTable("Interrogations");
+
+            #region Data Seeding
             List<Character> characters = new List<Character>(64);
             int characterCode = 0;
             for (int eyeColor = 0; eyeColor < 4; eyeColor++)
@@ -61,6 +76,7 @@ namespace spydle_api.Data
                     new CharacterSkinColor { Id = 3, Name = "Green", Red = 52, Green = 214, Blue = 41 }
                 );
             });
+            #endregion
         }
     }
 }
