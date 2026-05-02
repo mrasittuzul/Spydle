@@ -27,7 +27,7 @@ namespace spydle_api.Services
                     audience: configuration["Jwt:Audience"],
                     claims: new List<Claim> 
                     {
-                        new Claim("userName", user.UserName)
+                        new Claim("userId", user.Id)
                     },
                     notBefore: dateTimeNow,
                     expires: dateTimeNow.Add(TimeSpan.FromMinutes(configuration.GetValue<long>("Jwt:ExpirationInMinutes"))),
