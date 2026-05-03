@@ -79,5 +79,19 @@ namespace spydle_api.Controllers
 
             return Ok(new InterrogationResultDTO { IsMatchFound = isMatchingTraitFound, InterrogationNumber = interrogationCount + 1 });
         }
+
+        [HttpGet("GetSpy")]
+        [Authorize]
+        public async Task<IActionResult> GetSpy()
+        {
+            string userId = HttpContext.User.Claims.First(c => c.Type == "userId").Value;
+            var user = await _context.Users.Include(u => u.Interrogations).FirstOrDefaultAsync(u => u.Id == userId);
+            int interrogationCount = user.Interrogations.Where(i => i.CaseDate == CaseController.TodaysCase.Date).Count();
+            if (interrogationCount < 6)
+            {
+                return BadRequest(new ErrorContainer("You haven't performed enough interrogations to get the identity of the spy."));
+            }
+            return Ok(new SpyDTO { SpyCharacterCode = CaseController.TodaysCase.SpyCharacterCode });
+        }
     }
 }
