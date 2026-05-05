@@ -76,6 +76,8 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
                 element.setVisible(false);
             }
         });
+
+        this.scene.events.emit("suspectToggled");
     }
 
     setResult(isMatchFound: boolean){

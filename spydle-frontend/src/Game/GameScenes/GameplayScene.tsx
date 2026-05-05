@@ -39,6 +39,8 @@ export default class GameplayScene extends Phaser.Scene {
         this.caseData = data.caseData;
         this.eyeColors = data.eyeColors;
         this.skinColors = data.skinColors;
+
+        this.events.on("suspectToggled", this.onSuspectToggled, this);
     }
 
     preload() {
@@ -59,21 +61,26 @@ export default class GameplayScene extends Phaser.Scene {
         separator.fillStyle(0xffffff);
         separator.fillRect(350, 0, 5, this.game.config.height as number);
 
-        this.submitButton = this.add.image(100, 613, "white").setDisplaySize(150, 64).setTint(this.submitButtonActiveColor).setOrigin(0, 0);
-        this.submitButtonText = this.add.text(175, 613 + 64/2, "Submit", {
-            fontSize: "18px",
-            color: "#000000"
-        })
-        .setOrigin(0.5)
-        .on("pointerdown", this.onSubmitButtonClicked);
+        this.spawnCharacters();
+        this.spawnSuspectGroups();
 
         this.statusText = this.add.text(175, 560, "Status", {
             fontSize: "18px",
             color: "#ffffff"
         }).setOrigin(0.5).setVisible(false);
 
-        this.spawnCharacters();
-        this.spawnSuspectGroups();
+        this.submitButton = this.add.image(100, 613, "white")
+            .setDisplaySize(150, 64)
+            .setOrigin(0, 0)
+            .setTint(this.submitButtonActiveColor)
+            .setAlpha(0.5)
+            .setInteractive(new Phaser.Geom.Rectangle(0, 0, 1, 1),
+                Phaser.Geom.Rectangle.Contains)
+            .on("pointerdown", this.onSubmitButtonClicked, this);
+        this.submitButtonText = this.add.text(175, 613 + 64/2, "0" + "/" + this.suspectGroups[0].capacity, {
+            fontSize: "18px",
+            color: "#000000"
+        }).setOrigin(0.5);
     }
 
     spawnCharacters() : void {
@@ -132,5 +139,12 @@ export default class GameplayScene extends Phaser.Scene {
         var interrogationResponse = result.data as {isMatchFound: boolean, interrogationNumber: number};
         currentSuspectGroup.setResult(interrogationResponse.isMatchFound);
         this.interrogationCount = interrogationResponse.interrogationNumber;
+    }
+
+    onSuspectToggled(){
+        var currentSuspectGroup = this.suspectGroups[this.interrogationCount];
+        var isSuspectGroupAtCapacity = currentSuspectGroup.suspectCodes.length == currentSuspectGroup.capacity;
+        this.submitButton.setAlpha(isSuspectGroupAtCapacity ? 1 : 0.5);
+        this.submitButtonText.setText(isSuspectGroupAtCapacity ? "Submit" : (currentSuspectGroup.suspectCodes.length + "/" + currentSuspectGroup.capacity))
     }
 }
