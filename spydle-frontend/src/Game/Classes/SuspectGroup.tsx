@@ -83,12 +83,10 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
     }
 
     onPointerOver(pointer: Phaser.Input.Pointer){
-        console.log("In " + this.groupIndex);
         this.scene.events.emit("suspectGroupHoverOn", this.suspectCodes);
     }
 
     onPointerOut(pointer: Phaser.Input.Pointer, hoveredObjects: Phaser.GameObjects.GameObject[]){
-        console.log("Out " + this.groupIndex);
         this.scene.events.emit("suspectGroupHoverOut", this.suspectCodes);
     }
 

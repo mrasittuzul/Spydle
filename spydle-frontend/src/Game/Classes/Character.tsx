@@ -88,7 +88,6 @@ export class Character extends Phaser.GameObjects.Container {
 
     onClicked(pointer: Phaser.Input.Pointer){
         this.scene.events.emit("onCharacterClicked", this);
-        console.log({p: pointer, x: this.x, y: this.y})
     }
 
     onSuspectGroupHoverOn(suspectCodes: number[]){
