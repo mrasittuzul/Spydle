@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import type { GameplayData } from "./PreloaderScene";
 import { Character } from "../Classes/Character";
+import { Post } from "../../Helpers/RequestHelper";
 
 import maleOldOverlay from '../../assets/GameAssets/MaleOldOverlay.png';
 import femaleOldOverlay from '../../assets/GameAssets/FemaleOldOverlay.png';
@@ -18,14 +19,16 @@ export default class GameplayScene extends Phaser.Scene {
     eyeColors: {red: number, green: number, blue: number}[] = [];
     skinColors: {red: number, green: number, blue: number}[] = [];
     characters: Character[] = [];
+    spyCharacter: Character = null!;
     suspectGroups: SuspectGroup[] = [];
-
+    interrogationCount: number = 0;
     submitButton!: Phaser.GameObjects.Image;
     submitButtonText!: Phaser.GameObjects.Text;
+    statusText!: Phaser.GameObjects.Text;
+
     submitButtonActiveColor: number = 0x1e93ee;
     submitButtonInactiveColor: number = 0x104065;
-
-    statusText!: Phaser.GameObjects.Text;
+    isMakingRequest: boolean = false;
 
     constructor() {
         super({ key: "GameplayScene" });
@@ -33,9 +36,9 @@ export default class GameplayScene extends Phaser.Scene {
 
     init(data: GameplayData)
     {
-        this.caseData = data.caseData,
-        this.eyeColors = data.eyeColors,
-        this.skinColors = data.skinColors
+        this.caseData = data.caseData;
+        this.eyeColors = data.eyeColors;
+        this.skinColors = data.skinColors;
     }
 
     preload() {
@@ -60,7 +63,9 @@ export default class GameplayScene extends Phaser.Scene {
         this.submitButtonText = this.add.text(175, 613 + 64/2, "Submit", {
             fontSize: "18px",
             color: "#000000"
-        }).setOrigin(0.5);
+        })
+        .setOrigin(0.5)
+        .on("pointerdown", this.onSubmitButtonClicked);
 
         this.statusText = this.add.text(175, 560, "Status", {
             fontSize: "18px",
@@ -84,6 +89,10 @@ export default class GameplayScene extends Phaser.Scene {
             const posY = startingPosition.y + Math.floor(i / columnCount) * (textureSize.height + rowGap)
             this.characters.push(new Character(this, this.caseData.includedCharacters[i], posX, posY, true));
         }
+
+        // Spawn another character to show who the spy is at the end of the game.
+        this.spyCharacter = new Character(this, 0, 151, 529, false);
+        this.spyCharacter.setVisible(false);
     }
 
     spawnSuspectGroups() : void {
@@ -94,8 +103,34 @@ export default class GameplayScene extends Phaser.Scene {
         const backgroundColor = new Phaser.Display.Color(44, 44, 44);
 
         for(let i = 0; i < suspectGroupCount; i++){
-            const suspectGroup = new SuspectGroup(this, suspectCountPerGroup, backgroundColor, startingPos.x, startingPos.y + suspectGroupGap * i);
+            const suspectGroup = new SuspectGroup(this, i, suspectCountPerGroup, backgroundColor, startingPos.x, startingPos.y + suspectGroupGap * i);
             this.suspectGroups.push(suspectGroup);
         }
+
+        this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(163, 189, 196)); // Final guess suspect group has a different color.
+    }
+
+    async onSubmitButtonClicked() : Promise<void> {
+        if(this.isMakingRequest){
+            return;
+        }
+
+        var currentSuspectGroup = this.suspectGroups[this.interrogationCount];
+        if(currentSuspectGroup.suspectCodes.length < currentSuspectGroup.capacity){
+            return;
+        }
+
+        this.isMakingRequest = true;
+        var result = await Post<{isMatchFound: boolean, interrogationNumber: number}>("Character/CheckSuspects", 
+            { SuspectCodes: currentSuspectGroup.characters.map((s: Character) => s.code) })
+        this.isMakingRequest = false;
+        if(result.status != 200){
+            this.statusText.setText("Try submitting again");
+            return;
+        }
+
+        var interrogationResponse = result.data as {isMatchFound: boolean, interrogationNumber: number};
+        currentSuspectGroup.setResult(interrogationResponse.isMatchFound);
+        this.interrogationCount = interrogationResponse.interrogationNumber;
     }
 }

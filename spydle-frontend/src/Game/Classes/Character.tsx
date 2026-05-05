@@ -8,7 +8,7 @@ export class Character extends Phaser.GameObjects.Container {
     characterTraits: CharacterTraits;
 
     isOutlineVisible: boolean = false;
-    outlineColor: Phaser.Display.Color = new Phaser.Display.Color(0, 0, 0);
+    outlineColor: Phaser.Display.Color = new Phaser.Display.Color(255, 255, 255);
 
     baseImage!: Phaser.GameObjects.Image;
     eyeSockets!: Phaser.GameObjects.Image;
@@ -29,12 +29,16 @@ export class Character extends Phaser.GameObjects.Container {
                 Phaser.Geom.Rectangle.Contains
             );
             this.on("pointerdown", this.onClicked);
+            this.scene.events.on("suspectGroupHoverOn", this.onSuspectGroupHoverOn, this);
+            this.scene.events.on("suspectGroupHoverOut", this.onSuspectGroupHoverOut, this);
         }
 
         this.code = code;
         this.characterTraits = this.decodeCharacterTraitsFromCode(code);
         this.createContainer();
         this.setCharacterTraits(this.characterTraits);
+
+        //this.scene.input.enableDebug(this, 0xffff00);
     }
 
     decodeCharacterTraitsFromCode(code: number) : CharacterTraits {
@@ -55,6 +59,10 @@ export class Character extends Phaser.GameObjects.Container {
 
         this.add([this.baseImage, this.eyeSockets, this.eyeFill, this.oldOverlay, this.outline]);
         this.scene.add.existing(this);
+    }
+
+    setCode(code: number){
+        this.setCharacterTraits(this.decodeCharacterTraitsFromCode(code));
     }
 
     setCharacterTraits(characterTraits: CharacterTraits){
@@ -79,7 +87,22 @@ export class Character extends Phaser.GameObjects.Container {
     }
 
     onClicked(pointer: Phaser.Input.Pointer){
+        this.scene.events.emit("onCharacterClicked", this);
         console.log({p: pointer, x: this.x, y: this.y})
+    }
+
+    onSuspectGroupHoverOn(suspectCodes: number[]){
+        if(suspectCodes.indexOf(this.code) === -1){
+            return;
+        }
+        this.setOutline(true, this.outlineColor);
+    }
+    
+    onSuspectGroupHoverOut(suspectCodes: number[]){
+        if(suspectCodes.indexOf(this.code) === -1){
+            return;
+        }
+        this.setOutline(false, this.outlineColor);
     }
 }
 
