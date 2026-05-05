@@ -64,10 +64,10 @@ export default class GameplayScene extends Phaser.Scene {
         this.spawnCharacters();
         this.spawnSuspectGroups();
 
-        this.statusText = this.add.text(175, 560, "Status", {
-            fontSize: "18px",
+        this.statusText = this.add.text(175, 560, "", {
+            fontSize: "16px",
             color: "#ffffff"
-        }).setOrigin(0.5).setVisible(false);
+        }).setOrigin(0.5);
 
         this.submitButton = this.add.image(100, 613, "white")
             .setDisplaySize(150, 64)
@@ -128,9 +128,11 @@ export default class GameplayScene extends Phaser.Scene {
         }
 
         this.isMakingRequest = true;
+        this.statusText.setText("Interrogating...");
         var result = await Post<{isMatchFound: boolean, interrogationNumber: number}>("Character/CheckSuspects", 
             { SuspectCodes: currentSuspectGroup.characters.map((s: Character) => s.code) })
         this.isMakingRequest = false;
+        this.statusText.setText("");
         if(result.status != 200){
             this.statusText.setText("Try submitting again");
             return;
