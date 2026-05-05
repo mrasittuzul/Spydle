@@ -1,18 +1,18 @@
 import { BASE_API_URL } from "../Constants";
 
-type ApiGenericResponse = { status: number, data: ApiLoginResponse | ApiErrorResponse | {}}
+type ApiGenericResponse<T> = { status: number, data: T | ApiErrorResponse }
 export type ApiLoginResponse = { token: string, tokenExpireDate: string };
 export type ApiErrorResponse = { errors: string[]};
 
-export async function Get(url: string) : Promise<ApiGenericResponse>{
-    return await Request("GET", url, null);
+export async function Get<T>(url: string) : Promise<ApiGenericResponse<T>>{
+    return await Request<T>("GET", url, null);
 }
 
-export async function Post(url: string, body: object) : Promise<ApiGenericResponse>{
-    return await Request("POST", url, body);
+export async function Post<T>(url: string, body: object) : Promise<ApiGenericResponse<T>>{
+    return await Request<T>("POST", url, body);
 }
 
-async function Request(method: string, url: string, body: object | null) : Promise<ApiGenericResponse> {
+async function Request<T>(method: string, url: string, body: object | null) : Promise<ApiGenericResponse<T>> {
     const requestOptions = {
         method: method,
         headers: { 

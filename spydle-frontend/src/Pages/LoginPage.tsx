@@ -21,7 +21,7 @@ export default function LoginPage(){
 
         const email: string = emailRef.current.value;
         const password: string = passwordRef.current.value;
-        const response = await Post("Account/Login", { Email: email, Password: password });
+        const response = await Post<ApiLoginResponse>("Account/Login", { Email: email, Password: password });
         if(response.status == 200){
             const loginResponse = response.data as ApiLoginResponse;
             localStorage.setItem("jwt", loginResponse.token);
