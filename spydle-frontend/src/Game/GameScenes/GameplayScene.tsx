@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 import type { GameplayData } from "./PreloaderScene";
 import { Character } from "../Classes/Character";
-import { Post } from "../../Helpers/RequestHelper";
+import { Get, Post } from "../../Helpers/RequestHelper";
 
 import maleOldOverlay from '../../assets/GameAssets/MaleOldOverlay.png';
 import femaleOldOverlay from '../../assets/GameAssets/FemaleOldOverlay.png';
@@ -99,6 +99,8 @@ export default class GameplayScene extends Phaser.Scene {
 
         // Spawn another character to show who the spy is at the end of the game.
         this.spyCharacter = new Character(this, 0, 151, 529, false);
+        this.spyCharacter.on("pointerover", this.onSpyCharacterHoverOn, this);
+        this.spyCharacter.on("pointerout", this.onSpyCharacterHoverOut, this);
         this.spyCharacter.setVisible(false);
     }
 
@@ -117,13 +119,19 @@ export default class GameplayScene extends Phaser.Scene {
         this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(163, 189, 196)); // Final guess suspect group has a different color.
     }
 
-    async onSubmitButtonClicked() : Promise<void> {
+    async onSubmitButtonClicked(){
         if(this.isMakingRequest){
             return;
         }
 
         var currentSuspectGroup = this.suspectGroups[this.interrogationCount];
         if(currentSuspectGroup.suspectCodes.length < currentSuspectGroup.capacity){
+            return;
+        }
+
+        // In case the automatic spy character query fails and the user is asked to try again.
+        if(this.interrogationCount === 6){
+            await this.revealSpyCharacter();
             return;
         }
 
@@ -141,6 +149,32 @@ export default class GameplayScene extends Phaser.Scene {
         var interrogationResponse = result.data as {isMatchFound: boolean, interrogationNumber: number};
         currentSuspectGroup.setResult(interrogationResponse.isMatchFound);
         this.interrogationCount = interrogationResponse.interrogationNumber;
+
+        // Get the spy character after the last interrogation.
+        if(this.interrogationCount === 6){
+            await this.revealSpyCharacter();
+        }
+    }
+
+    async revealSpyCharacter(){
+        if(this.interrogationCount === 6){
+            this.isMakingRequest = true;
+            this.statusText.setText("Getting Result...");
+            var spyResult = await Get<{ spyCharacterCode: number }>("Character/GetSpy");
+            this.isMakingRequest = false;
+            this.statusText.setText("");
+
+            if(spyResult.status === 200){
+                this.spyCharacter.setCode((spyResult.data as { spyCharacterCode: number }).spyCharacterCode)
+                this.spyCharacter.setInteractive(new Phaser.Geom.Rectangle(0, 0, 48, 64),
+                    Phaser.Geom.Rectangle.Contains);
+                this.spyCharacter.isInteractive = true;
+                this.spyCharacter.setVisible(true);
+            }
+            else{
+                this.statusText.setText("Please submit again.");
+            }
+        }
     }
 
     onSuspectToggled(){
@@ -148,5 +182,19 @@ export default class GameplayScene extends Phaser.Scene {
         var isSuspectGroupAtCapacity = currentSuspectGroup.suspectCodes.length == currentSuspectGroup.capacity;
         this.submitButton.setAlpha(isSuspectGroupAtCapacity ? 1 : 0.5);
         this.submitButtonText.setText(isSuspectGroupAtCapacity ? "Submit" : (currentSuspectGroup.suspectCodes.length + "/" + currentSuspectGroup.capacity))
+    }
+
+    onSpyCharacterHoverOn(){
+        if(!this.spyCharacter.isInteractive){
+            return;
+        }
+        this.characters.find(c => c.code == this.spyCharacter.code)?.setOutline(true, this.spyCharacter.outlineColor);
+    }
+
+    onSpyCharacterHoverOut(){
+        if(!this.spyCharacter.isInteractive){
+            return;
+        }
+        this.characters.find(c => c.code == this.spyCharacter.code)?.setOutline(false, this.spyCharacter.outlineColor);
     }
 }

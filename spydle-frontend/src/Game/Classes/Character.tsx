@@ -6,7 +6,8 @@ export class Character extends Phaser.GameObjects.Container {
     
     code: number;
     characterTraits: CharacterTraits;
-
+    
+    isInteractive: boolean = false;
     isOutlineVisible: boolean = false;
     outlineColor: Phaser.Display.Color = new Phaser.Display.Color(255, 255, 255);
 
@@ -31,6 +32,7 @@ export class Character extends Phaser.GameObjects.Container {
             this.on("pointerdown", this.onClicked);
             this.scene.events.on("suspectGroupHoverOn", this.onSuspectGroupHoverOn, this);
             this.scene.events.on("suspectGroupHoverOut", this.onSuspectGroupHoverOut, this);
+            this.isInteractive = true;
         }
 
         this.code = code;
