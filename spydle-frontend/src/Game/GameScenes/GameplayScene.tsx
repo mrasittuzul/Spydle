@@ -130,7 +130,7 @@ export default class GameplayScene extends Phaser.Scene {
         this.isMakingRequest = true;
         this.statusText.setText("Interrogating...");
         var result = await Post<{isMatchFound: boolean, interrogationNumber: number}>("Character/CheckSuspects", 
-            { SuspectCodes: currentSuspectGroup.characters.map((s: Character) => s.code) })
+            { SuspectCodes: currentSuspectGroup.suspectCodes })
         this.isMakingRequest = false;
         this.statusText.setText("");
         if(result.status != 200){

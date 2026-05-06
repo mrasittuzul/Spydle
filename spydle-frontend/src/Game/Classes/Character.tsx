@@ -62,6 +62,7 @@ export class Character extends Phaser.GameObjects.Container {
     }
 
     setCode(code: number){
+        this.code = code;
         this.setCharacterTraits(this.decodeCharacterTraitsFromCode(code));
     }
 
