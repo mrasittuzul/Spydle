@@ -166,7 +166,7 @@ export default class GameplayScene extends Phaser.Scene {
 
             if(spyResult.status === 200){
                 this.spyCharacter.setCode((spyResult.data as { spyCharacterCode: number }).spyCharacterCode)
-                this.spyCharacter.setInteractive(new Phaser.Geom.Rectangle(0, 0, 48, 64),
+                this.spyCharacter.setInteractive(new Phaser.Geom.Rectangle(48/2, 64/2, 48, 64),
                     Phaser.Geom.Rectangle.Contains);
                 this.spyCharacter.isInteractive = true;
                 this.spyCharacter.setVisible(true);
