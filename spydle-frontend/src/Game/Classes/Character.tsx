@@ -56,7 +56,7 @@ export class Character extends Phaser.GameObjects.Container {
         this.baseImage = this.scene.add.image(0, 0, "").setOrigin(0, 0);
         this.eyeSockets = this.scene.add.image(0, 0, "eyeSockets").setOrigin(0, 0);
         this.eyeFill = this.scene.add.image(0, 0, "eyeFill").setOrigin(0, 0);
-        this.oldOverlay = this.scene.add.image(0, 0, this.characterTraits.Sex === 0 ? "maleOldOverlay" : "femaleOldOverlay").setOrigin(0, 0).setVisible(this.characterTraits.Age === 1);
+        this.oldOverlay = this.scene.add.image(0, 0, "oldOverlay").setOrigin(0, 0).setVisible(this.characterTraits.Age === 1);
         this.outline = this.scene.add.image(0, 0, "").setOrigin(0, 0).setVisible(false);
 
         this.add([this.baseImage, this.eyeSockets, this.eyeFill, this.oldOverlay, this.outline]);
@@ -73,13 +73,11 @@ export class Character extends Phaser.GameObjects.Container {
         const outlineTexture = characterTraits.Sex === 0 ? "maleOutline" : "femaleOutline";
         const skinColor = this.scene.skinColors[characterTraits.EyeColorIndex]; 
         const eyeColor = this.scene.eyeColors[characterTraits.EyeColorIndex];
-        const oldOverlayTexture = characterTraits.Age === 0 ? "maleOldOverlay" : "femaleOldOverlay";
 
         this.baseImage.setTexture(baseTexture);
         this.outline.setTexture(outlineTexture);
         this.baseImage.setTint(new Phaser.Display.Color(skinColor.red, skinColor.green, skinColor.blue).color);
         this.eyeFill.setTint(new Phaser.Display.Color(eyeColor.red, eyeColor.green, eyeColor.blue).color);
-        this.oldOverlay.setTexture(oldOverlayTexture);
     }
 
     setOutline(isVisible: boolean, color: Phaser.Display.Color){

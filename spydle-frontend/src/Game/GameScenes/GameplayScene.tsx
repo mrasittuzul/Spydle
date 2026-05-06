@@ -3,8 +3,7 @@ import type { GameplayData } from "./PreloaderScene";
 import { Character } from "../Classes/Character";
 import { Get, Post } from "../../Helpers/RequestHelper";
 
-import maleOldOverlay from '../../assets/GameAssets/MaleOldOverlay.png';
-import femaleOldOverlay from '../../assets/GameAssets/FemaleOldOverlay.png';
+import oldOverlay from '../../assets/GameAssets/OldOverlay.png';
 import eyeFill from '../../assets/GameAssets/EyeFill.png';
 import eyeSockets from '../../assets/GameAssets/EyeSockets.png';
 import femaleBase from '../../assets/GameAssets/FemaleBase.png';
@@ -45,8 +44,7 @@ export default class GameplayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('femaleOldOverlay', femaleOldOverlay);
-        this.load.image('maleOldOverlay', maleOldOverlay);
+        this.load.image('oldOverlay', oldOverlay);
         this.load.image('eyeFill', eyeFill);
         this.load.image('eyeSockets', eyeSockets);
         this.load.image('femaleBase', femaleBase);
