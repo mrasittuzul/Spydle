@@ -20,6 +20,7 @@ export default class GameplayScene extends Phaser.Scene {
     skinColors: {red: number, green: number, blue: number}[] = [];
     characters: Character[] = [];
     spyCharacter: Character = null!;
+    spyFoundResultPip: Phaser.GameObjects.Image = null!;
     suspectGroups: SuspectGroup[] = [];
     interrogationCount: number = 0;
     submitButton!: Phaser.GameObjects.Image;
@@ -40,7 +41,7 @@ export default class GameplayScene extends Phaser.Scene {
         this.eyeColors = data.eyeColors;
         this.skinColors = data.skinColors;
 
-        this.events.on("suspectToggled", this.onSuspectToggled, this);
+        this.events.on("suspectToggled", this.updateSubmitButtonAppearance, this);
     }
 
     preload() {
@@ -102,16 +103,18 @@ export default class GameplayScene extends Phaser.Scene {
         this.spyCharacter.on("pointerover", this.onSpyCharacterHoverOn, this);
         this.spyCharacter.on("pointerout", this.onSpyCharacterHoverOut, this);
         this.spyCharacter.setVisible(false);
+        this.spyFoundResultPip = this.add.image(151+48+7, 529+(64/2)-7, "white").setDisplaySize(15, 15).setOrigin(0, 0);
+        this.spyFoundResultPip.setVisible(false);
     }
 
     spawnSuspectGroups() : void {
         const suspectGroupGap = 84;
         const startingPos = { x: 25, y: 25 };
         const suspectGroupCount = 6;
-        const suspectCountPerGroup = 5;
         const backgroundColor = new Phaser.Display.Color(44, 44, 44);
 
         for(let i = 0; i < suspectGroupCount; i++){
+            const suspectCountPerGroup = i === (suspectGroupCount - 1) ? 5 : 1;
             const suspectGroup = new SuspectGroup(this, i, suspectCountPerGroup, backgroundColor, startingPos.x, startingPos.y + suspectGroupGap * i);
             this.suspectGroups.push(suspectGroup);
         }
@@ -149,6 +152,7 @@ export default class GameplayScene extends Phaser.Scene {
         var interrogationResponse = result.data as {isMatchFound: boolean, interrogationNumber: number};
         currentSuspectGroup.setResult(interrogationResponse.isMatchFound);
         this.interrogationCount = interrogationResponse.interrogationNumber;
+        this.updateSubmitButtonAppearance();
 
         // Get the spy character after the last interrogation.
         if(this.interrogationCount === 6){
@@ -165,11 +169,16 @@ export default class GameplayScene extends Phaser.Scene {
             this.statusText.setText("");
 
             if(spyResult.status === 200){
-                this.spyCharacter.setCode((spyResult.data as { spyCharacterCode: number }).spyCharacterCode)
+                var spyCharacterCode = (spyResult.data as { spyCharacterCode: number }).spyCharacterCode;
+                this.spyCharacter.setCode(spyCharacterCode)
                 this.spyCharacter.setInteractive(new Phaser.Geom.Rectangle(48/2, 64/2, 48, 64),
                     Phaser.Geom.Rectangle.Contains);
                 this.spyCharacter.isInteractive = true;
                 this.spyCharacter.setVisible(true);
+
+                var isSpyFoundInLastInterrogation = this.suspectGroups[this.suspectGroups.length - 1].suspectCodes.indexOf(spyCharacterCode) > -1;
+                this.spyFoundResultPip.setVisible(true);
+                this.spyFoundResultPip.setTint(new Phaser.Display.Color(isSpyFoundInLastInterrogation ? 0 : 255, isSpyFoundInLastInterrogation ? 255 : 0, 0).color);
             }
             else{
                 this.statusText.setText("Please submit again.");
@@ -177,11 +186,17 @@ export default class GameplayScene extends Phaser.Scene {
         }
     }
 
-    onSuspectToggled(){
-        var currentSuspectGroup = this.suspectGroups[this.interrogationCount];
-        var isSuspectGroupAtCapacity = currentSuspectGroup.suspectCodes.length == currentSuspectGroup.capacity;
-        this.submitButton.setAlpha(isSuspectGroupAtCapacity ? 1 : 0.5);
-        this.submitButtonText.setText(isSuspectGroupAtCapacity ? "Submit" : (currentSuspectGroup.suspectCodes.length + "/" + currentSuspectGroup.capacity))
+    updateSubmitButtonAppearance(){
+        if(this.interrogationCount < this.suspectGroups.length){
+            const currentSuspectGroup = this.suspectGroups[this.interrogationCount];
+            const isSuspectGroupAtCapacity = currentSuspectGroup.suspectCodes.length == currentSuspectGroup.capacity;
+            this.submitButton.setAlpha(isSuspectGroupAtCapacity ? 1 : 0.5);
+            this.submitButtonText.setText(isSuspectGroupAtCapacity ? "Submit" : (currentSuspectGroup.suspectCodes.length + "/" + currentSuspectGroup.capacity))
+        }
+        else{
+            this.submitButton.setAlpha(0.5);
+            this.submitButtonText.setText("");
+        }
     }
 
     onSpyCharacterHoverOn(){
