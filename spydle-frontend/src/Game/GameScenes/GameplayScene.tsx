@@ -116,7 +116,7 @@ export default class GameplayScene extends Phaser.Scene {
             this.suspectGroups.push(suspectGroup);
         }
 
-        this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(163, 189, 196)); // Final guess suspect group has a different color.
+        this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(66, 66, 66)); // Final guess suspect group has a different color.
     }
 
     async onSubmitButtonClicked(){
