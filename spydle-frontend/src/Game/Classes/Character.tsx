@@ -71,7 +71,7 @@ export class Character extends Phaser.GameObjects.Container {
     setCharacterTraits(characterTraits: CharacterTraits){
         const baseTexture = characterTraits.Sex === 0 ? "maleBase" : "femaleBase";
         const outlineTexture = characterTraits.Sex === 0 ? "maleOutline" : "femaleOutline";
-        const skinColor = this.scene.skinColors[characterTraits.EyeColorIndex]; 
+        const skinColor = this.scene.skinColors[characterTraits.SkinColorIndex]; 
         const eyeColor = this.scene.eyeColors[characterTraits.EyeColorIndex];
 
         this.baseImage.setTexture(baseTexture);
