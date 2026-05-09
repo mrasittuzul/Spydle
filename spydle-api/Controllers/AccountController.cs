@@ -27,7 +27,7 @@ namespace spydle_api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ErrorContainer("Invalid request"));
+                return BadRequest(new ErrorContainer(ModelState.ToErrorCollection()));
             }
 
             var user = await _userManager.FindByEmailAsync(registerRequest.Email);
