@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Post } from "../Helpers/RequestHelper";
 import type { ApiErrorResponse } from "../Helpers/RequestHelper";
 import { useAuthContext } from "../Contexts/AuthContext";
@@ -53,6 +53,9 @@ export default function LoginPage(){
                     </li>
                     <li className={styles.submitItem}>
                         <button className={styles.button} onClick={onLoginButtonClicked}>Enter</button>
+                    </li>
+                    <li className={styles.submitItem}>
+                        <Link to="/Signup" className={styles.signup} onClick={onLoginButtonClicked}>Don't have an account? Sign Up</Link>
                     </li>
                 </ul>
                 {loginErrors && (

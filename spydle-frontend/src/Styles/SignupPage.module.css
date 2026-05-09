@@ -111,13 +111,3 @@
   padding: 0.5rem 0.75rem;
   border-left: 2px solid var(--color-error);
 }
-
-.signup {
-  font-family: var(--font-ui);
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--color-gold);
-  margin-bottom: 1.5rem;
-}
