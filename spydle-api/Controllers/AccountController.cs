@@ -41,8 +41,7 @@ namespace spydle_api.Controllers
                 var result = await _userManager.CreateAsync(registeringUser, registerRequest.Password);
                 if (result.Succeeded)
                 {
-                    var token = _tokenService.GenerateToken(registeringUser);
-                    return Ok(token.Result);
+                    return Ok("Successfuly registered.");
                 }
                 return StatusCode(500, new ErrorContainer(result.Errors.Select(identityError => identityError.Description).ToArray()));
             }
