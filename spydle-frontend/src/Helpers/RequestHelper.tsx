@@ -1,7 +1,6 @@
 import { BASE_API_URL } from "../Constants";
 
 type ApiGenericResponse<T> = { status: number, data: T | ApiErrorResponse }
-export type ApiLoginResponse = { token: string, tokenExpireDate: string };
 export type ApiErrorResponse = { errors: string[]};
 
 export async function Get<T>(url: string) : Promise<ApiGenericResponse<T>>{

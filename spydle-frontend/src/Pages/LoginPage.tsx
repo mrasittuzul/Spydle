@@ -1,10 +1,12 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Post } from "../Helpers/RequestHelper";
-import type { ApiLoginResponse, ApiErrorResponse } from "../Helpers/RequestHelper";
+import type { ApiErrorResponse } from "../Helpers/RequestHelper";
 import { useAuthContext } from "../Contexts/AuthContext";
 
 import styles from '../styles/LoginPage.module.css';
+
+type ApiLoginResponse = { token: string, tokenExpireDate: string };
 
 export default function LoginPage(){
 
