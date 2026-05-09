@@ -1,10 +1,10 @@
 import SpydleGame from "../Components/SpydleGame";
+import styles from "../styles/GamePage.module.css";
 
 export default function GamePage(){
     return(
-        <>
+        <div className={styles.page}>
             <SpydleGame/>
-        </>
             <div className={styles.gameDescription}>
                 <p>
                     The goal of the game is to find the spy.
@@ -14,5 +14,6 @@ export default function GamePage(){
                     The spy character and whether you were successful or not will be revealed after the last interrogation.
                 </p>
             </div>
+        </div>
     );
 }

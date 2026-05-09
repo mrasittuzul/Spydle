@@ -1,0 +1,24 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.gameDescription {
+  max-width: 680px;
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 2px solid var(--color-gold-dim);
+  padding: 1.5rem 2rem;
+}
+
+.gameDescription p {
+  font-size: 0.78rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  line-height: 2;
+  color: var(--color-text-dim);
+}

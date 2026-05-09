@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:           #0a0a0c;
+  --color-surface:      #111116;
+  --color-surface-2:    #1a1a22;
+  --color-border:       #2a2a35;
+  --color-gold:         #c9a84c;
+  --color-gold-dim:     #7a6230;
+  --color-gold-glow:    rgba(201, 168, 76, 0.15);
+  --color-text:         #e8e4dc;
+  --color-text-muted:   #6b6860;
+  --color-text-dim:     #9e9a92;
+  --color-error:        #c0392b;
+  --color-error-dim:    rgba(192, 57, 43, 0.15);
+
+  --font-display:       'Cormorant Garamond', Georgia, serif;
+  --font-ui:            'Josefin Sans', 'Helvetica Neue', sans-serif;
+
+  --radius-sm:          2px;
+  --radius-md:          4px;
+
+  --transition-fast:    150ms ease;
+  --transition-med:     300ms ease;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(201, 168, 76, 0.02) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+a {
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover {
+  opacity: 0.75;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+}

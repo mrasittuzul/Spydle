@@ -1,16 +1,18 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useAuthContext } from "../Contexts/AuthContext";
+import styles from "../styles/Header.module.css";
 
 export default function Header(){
     const { isAuthorized } = useAuthContext();
 
     return(
-        <nav>
-            <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>Home</NavLink>
-            {
-                isAuthorized ? <NavLink to="/Logout" className={({ isActive }) => isActive ? "active" : ""}>Log Out</NavLink>
-                             : <NavLink to="/Login" className={({ isActive }) => isActive ? "active" : ""}>Log In</NavLink>
-            }
+        <nav className={styles.nav}>
+            <span className={styles.logo}><Link to="/">Spydle</Link></span>
+            <div className={styles.navLinks}>
+                {isAuthorized ? <NavLink to="/Logout" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ""}`}>Log Out</NavLink>
+                              : <NavLink to="/Login" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ""}`}>Log In</NavLink>
+                }
+            </div>
         </nav>
     );
 }

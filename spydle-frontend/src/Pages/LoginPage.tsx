@@ -4,6 +4,8 @@ import { Post } from "../Helpers/RequestHelper";
 import type { ApiLoginResponse, ApiErrorResponse } from "../Helpers/RequestHelper";
 import { useAuthContext } from "../Contexts/AuthContext";
 
+import styles from '../styles/LoginPage.module.css';
+
 export default function LoginPage(){
 
     const [loginErrors, setLoginErrors] = useState<string[]>();
@@ -34,21 +36,31 @@ export default function LoginPage(){
     }
 
     return(
-        <div>
-            <ul>
-                <li>
-                    <label>Email</label>
-                    <input ref={emailRef}></input>
-                </li>
-                <li>
-                    <label>Password</label>
-                    <input ref={passwordRef} type="password"></input>
-                </li>
-                <li>
-                    <button onClick={onLoginButtonClicked}>Login</button>
-                </li>
-            </ul>
-            {loginErrors && <ul>{loginErrors.map((err, index) => <li key={index}>{err}</li>)}</ul>}
+        <div className={styles.page}>
+            <div className={styles.card}>
+                <h1 className={styles.heading}>Log In</h1>
+                <p className={styles.subheading}>Identify yourself</p>
+                <ul className={styles.fieldList}>
+                    <li className={styles.fieldItem}>
+                        <label className={styles.label}>Email</label>
+                        <input className={styles.input} ref={emailRef} />
+                    </li>
+                    <li className={styles.fieldItem}>
+                        <label className={styles.label}>Password</label>
+                        <input className={styles.input} ref={passwordRef} type="password" />
+                    </li>
+                    <li className={styles.submitItem}>
+                        <button className={styles.button} onClick={onLoginButtonClicked}>Enter</button>
+                    </li>
+                </ul>
+                {loginErrors && (
+                    <ul className={styles.errorList}>
+                        {loginErrors.map((err, index) => (
+                            <li key={index} className={styles.errorItem}>{err}</li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
     );
 }
