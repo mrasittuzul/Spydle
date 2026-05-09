@@ -10,8 +10,7 @@ namespace spydle_api.Models
         public string Email { get; set; } = null!;
 
         [Required]
-        [MinLength(2)]
-        [MaxLength(30)]
+        [Length(2, 32, ErrorMessage = "Username needs to be between 2 and 32 characters")]
         public string Username { get; set; } = null!;
 
         [Required]
