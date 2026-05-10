@@ -93,7 +93,7 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
     }
 
     onCharacterClicked(clickedCharacter: Character){
-        if(this.scene.interrogationCount !== this.groupIndex || clickedCharacter === this.scene.spyCharacter){
+        if(this.scene.isGameOver || this.scene.isMakingRequest || this.scene.interrogationCount !== this.groupIndex){
             return;
         }
         this.toggleSuspect(clickedCharacter);

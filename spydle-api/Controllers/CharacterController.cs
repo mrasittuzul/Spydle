@@ -52,7 +52,7 @@ namespace spydle_api.Controllers
             string userId = HttpContext.User.Claims.First(c => c.Type == "userId").Value;
             var user = await _context.Users.Include(u => u.Interrogations).FirstOrDefaultAsync(u => u.Id == userId);
             int interrogationCount = user.Interrogations.Where(i => i.CaseDate == CaseController.TodaysCase.Date).Count();
-            if (interrogationCount == 6)
+            if (interrogationCount == CaseController.TodaysCase.InterrogationCount)
             {
                 return BadRequest(new ErrorContainer("You don't have any interrogations left."));
             }
@@ -87,7 +87,7 @@ namespace spydle_api.Controllers
             string userId = HttpContext.User.Claims.First(c => c.Type == "userId").Value;
             var user = await _context.Users.Include(u => u.Interrogations).FirstOrDefaultAsync(u => u.Id == userId);
             int interrogationCount = user.Interrogations.Where(i => i.CaseDate == CaseController.TodaysCase.Date).Count();
-            if (interrogationCount < 6)
+            if (interrogationCount < CaseController.TodaysCase.InterrogationCount)
             {
                 return BadRequest(new ErrorContainer("You haven't performed enough interrogations to get the identity of the spy."));
             }

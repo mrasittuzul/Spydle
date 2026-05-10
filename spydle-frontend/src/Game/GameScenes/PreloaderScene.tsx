@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 import { Get } from "../../Helpers/RequestHelper";
 
 export type GameplayData = {
-    caseData: {rngSeed: number, includedCharacters: number[]}
+    caseData: { interrogationCount: number, rngSeed: number, includedCharacters: number[]}
     eyeColors: {red: number, green: number, blue: number}[]
     skinColors: {red: number, green: number, blue: number}[]
 }

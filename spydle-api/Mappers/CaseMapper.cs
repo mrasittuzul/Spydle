@@ -7,7 +7,7 @@ namespace spydle_api.Mappers
     {
         public static CaseDTO ToCaseDTO(this Case caseToConvert)
         {
-            return new CaseDTO { IncludedCharacters = caseToConvert.IncludedCharacters, RngSeed = caseToConvert.RngSeed };
+            return new CaseDTO { InterrogationCount = caseToConvert.InterrogationCount, IncludedCharacters = caseToConvert.IncludedCharacters, RngSeed = caseToConvert.RngSeed };
         }
     }
 }

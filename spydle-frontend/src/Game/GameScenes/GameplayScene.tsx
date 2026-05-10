@@ -14,7 +14,7 @@ import white from '../../assets/GameAssets/white.png';
 import { SuspectGroup } from "../Classes/SuspectGroup";
 
 export default class GameplayScene extends Phaser.Scene {
-    caseData: {rngSeed: number, includedCharacters: number[]} = {rngSeed:0, includedCharacters:[]};
+    caseData: { interrogationCount: number, rngSeed: number, includedCharacters: number[]} = {interrogationCount:5, rngSeed:0, includedCharacters:[]};
     eyeColors: {red: number, green: number, blue: number}[] = [];
     skinColors: {red: number, green: number, blue: number}[] = [];
     characters: Character[] = [];
@@ -28,7 +28,9 @@ export default class GameplayScene extends Phaser.Scene {
 
     submitButtonActiveColor: number = 0x1e93ee;
     submitButtonInactiveColor: number = 0x104065;
+    
     isMakingRequest: boolean = false;
+    isGameOver: boolean = false;
 
     constructor() {
         super({ key: "GameplayScene" });
@@ -82,7 +84,7 @@ export default class GameplayScene extends Phaser.Scene {
         }).setOrigin(0.5);
     }
 
-    spawnCharacters() : void {
+    private spawnCharacters() : void {
         const baseTexture = this.textures.get("maleBase").getSourceImage();
         const textureSize = { width: baseTexture.width, height: baseTexture.height };
         const startingPosition = {x: 375, y: 25};
@@ -105,10 +107,10 @@ export default class GameplayScene extends Phaser.Scene {
         this.spyFoundResultPip.setVisible(false);
     }
 
-    spawnSuspectGroups() : void {
+    private spawnSuspectGroups() : void {
         const suspectGroupGap = 84;
         const startingPos = { x: 25, y: 25 };
-        const suspectGroupCount = 6;
+        const suspectGroupCount = this.caseData.interrogationCount + 1;
         const backgroundColor = new Phaser.Display.Color(44, 44, 44);
 
         for(let i = 0; i < suspectGroupCount; i++){
@@ -117,25 +119,31 @@ export default class GameplayScene extends Phaser.Scene {
             this.suspectGroups.push(suspectGroup);
         }
 
-        this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(66, 66, 66)); // Final guess suspect group has a different color.
+        this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(66, 66, 66)); // Final suspect group has a different color.
+        this.suspectGroups[suspectGroupCount - 1].resultPip.setVisible(false); // Final suspect group doesn't need a resultPip because the result for that interrogation is shown on spyFoundResultPip
     }
 
-    async onSubmitButtonClicked(){
-        if(this.isMakingRequest){
+    private async onSubmitButtonClicked(){
+        if (this.isGameOver || this.isMakingRequest){
             return;
         }
 
-        var currentSuspectGroup = this.suspectGroups[this.interrogationCount];
+        const currentSuspectGroup = this.suspectGroups[this.interrogationCount];
         if(currentSuspectGroup.suspectCodes.length < currentSuspectGroup.capacity){
             return;
         }
 
         // In case the automatic spy character query fails and the user is asked to try again.
-        if(this.interrogationCount === 6){
-            await this.revealSpyCharacter();
-            return;
+        if (this.interrogationCount < this.caseData.interrogationCount){
+            await this.interrogateSuspects();
         }
+        else {
+            await this.revealSpyCharacter();
+        }
+    }
 
+    private async interrogateSuspects(){
+        const currentSuspectGroup = this.suspectGroups[this.interrogationCount];
         this.isMakingRequest = true;
         this.statusText.setText("Interrogating...");
         var result = await Post<{isMatchFound: boolean, interrogationNumber: number}>("Character/CheckSuspects", 
@@ -151,41 +159,36 @@ export default class GameplayScene extends Phaser.Scene {
         currentSuspectGroup.setResult(interrogationResponse.isMatchFound);
         this.interrogationCount = interrogationResponse.interrogationNumber;
         this.updateSubmitButtonAppearance();
+    }
 
-        // Get the spy character after the last interrogation.
-        if(this.interrogationCount === 6){
-            await this.revealSpyCharacter();
+    private async revealSpyCharacter(){
+        this.isMakingRequest = true;
+        this.statusText.setText("Getting Result...");
+        var spyResult = await Get<{ spyCharacterCode: number }>("Character/GetSpy");
+        this.isMakingRequest = false;
+        this.statusText.setText("");
+
+        if(spyResult.status === 200){
+            var spyCharacterCode = (spyResult.data as { spyCharacterCode: number }).spyCharacterCode;
+            this.spyCharacter.setCode(spyCharacterCode)
+            this.spyCharacter.setInteractive(new Phaser.Geom.Rectangle(48/2, 64/2, 48, 64),
+                Phaser.Geom.Rectangle.Contains);
+            this.spyCharacter.isInteractive = true;
+            this.spyCharacter.setVisible(true);
+
+            var isSpyFoundInLastInterrogation = this.suspectGroups[this.suspectGroups.length - 1].suspectCodes.indexOf(spyCharacterCode) > -1;
+            this.spyFoundResultPip.setVisible(true);
+            this.spyFoundResultPip.setTint(new Phaser.Display.Color(isSpyFoundInLastInterrogation ? 0 : 255, isSpyFoundInLastInterrogation ? 255 : 0, 0).color);
+            this.isGameOver = true;
+            this.updateSubmitButtonAppearance();
+        }
+        else{
+            this.statusText.setText("Please submit again.");
         }
     }
 
-    async revealSpyCharacter(){
-        if(this.interrogationCount === 6){
-            this.isMakingRequest = true;
-            this.statusText.setText("Getting Result...");
-            var spyResult = await Get<{ spyCharacterCode: number }>("Character/GetSpy");
-            this.isMakingRequest = false;
-            this.statusText.setText("");
-
-            if(spyResult.status === 200){
-                var spyCharacterCode = (spyResult.data as { spyCharacterCode: number }).spyCharacterCode;
-                this.spyCharacter.setCode(spyCharacterCode)
-                this.spyCharacter.setInteractive(new Phaser.Geom.Rectangle(48/2, 64/2, 48, 64),
-                    Phaser.Geom.Rectangle.Contains);
-                this.spyCharacter.isInteractive = true;
-                this.spyCharacter.setVisible(true);
-
-                var isSpyFoundInLastInterrogation = this.suspectGroups[this.suspectGroups.length - 1].suspectCodes.indexOf(spyCharacterCode) > -1;
-                this.spyFoundResultPip.setVisible(true);
-                this.spyFoundResultPip.setTint(new Phaser.Display.Color(isSpyFoundInLastInterrogation ? 0 : 255, isSpyFoundInLastInterrogation ? 255 : 0, 0).color);
-            }
-            else{
-                this.statusText.setText("Please submit again.");
-            }
-        }
-    }
-
-    updateSubmitButtonAppearance(){
-        if(this.interrogationCount < this.suspectGroups.length){
+    private updateSubmitButtonAppearance(){
+        if(this.interrogationCount < this.caseData.interrogationCount + 1 && !this.isGameOver){
             const currentSuspectGroup = this.suspectGroups[this.interrogationCount];
             const isSuspectGroupAtCapacity = currentSuspectGroup.suspectCodes.length == currentSuspectGroup.capacity;
             this.submitButton.setAlpha(isSuspectGroupAtCapacity ? 1 : 0.5);
@@ -197,14 +200,14 @@ export default class GameplayScene extends Phaser.Scene {
         }
     }
 
-    onSpyCharacterHoverOn(){
+    private onSpyCharacterHoverOn(){
         if(!this.spyCharacter.isInteractive){
             return;
         }
         this.characters.find(c => c.code == this.spyCharacter.code)?.setOutline(true, this.spyCharacter.outlineColor);
     }
 
-    onSpyCharacterHoverOut(){
+    private onSpyCharacterHoverOut(){
         if(!this.spyCharacter.isInteractive){
             return;
         }

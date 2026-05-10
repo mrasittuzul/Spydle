@@ -43,6 +43,7 @@ namespace spydle_api.Controllers
                     TodaysCase = new Case
                     {
                         Date = DateTime.UtcNow.Date,
+                        InterrogationCount = 5,
                         RngSeed = rngSeed,
                         SpyCharacterCode = characters[random.Next(0, characters.Count)].Code,
                         IncludedCharacters = characters.Select(ch =>  ch.Code).ToArray()
