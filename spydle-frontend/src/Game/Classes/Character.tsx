@@ -69,6 +69,7 @@ export class Character extends Phaser.GameObjects.Container {
     }
 
     setCharacterTraits(characterTraits: CharacterTraits){
+        this.characterTraits = characterTraits;
         const baseTexture = characterTraits.Sex === 0 ? "maleBase" : "femaleBase";
         const outlineTexture = characterTraits.Sex === 0 ? "maleOutline" : "femaleOutline";
         const skinColor = this.scene.skinColors[characterTraits.SkinColorIndex]; 
@@ -78,7 +79,7 @@ export class Character extends Phaser.GameObjects.Container {
         this.outline.setTexture(outlineTexture);
         this.baseImage.setTint(new Phaser.Display.Color(skinColor.red, skinColor.green, skinColor.blue).color);
         this.eyeFill.setTint(new Phaser.Display.Color(eyeColor.red, eyeColor.green, eyeColor.blue).color);
-        this.oldOverlay.setVisible(this.characterTraits.Age === 1);
+        this.oldOverlay.setVisible(characterTraits.Age === 1);
     }
 
     setOutline(isVisible: boolean, color: Phaser.Display.Color){
