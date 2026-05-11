@@ -1,5 +1,5 @@
 import SpydleGame from "../Components/SpydleGame";
-import styles from "../styles/GamePage.module.css";
+import styles from "../Styles/GamePage.module.css";
 
 export default function GamePage(){
     return(

@@ -1,7 +1,7 @@
 import { useAuthContext } from "../Contexts/AuthContext"
 import { Link } from "react-router-dom";
 
-import styles from "../styles/HomePage.module.css";
+import styles from "../Styles/HomePage.module.css";
 
 export default function HomePage(){
     const authContext = useAuthContext();

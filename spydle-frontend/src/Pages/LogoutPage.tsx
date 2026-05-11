@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuthContext } from "../Contexts/AuthContext";
 
-import styles from "../styles/LogoutPage.module.css";
+import styles from "../Styles/LogoutPage.module.css";
 
 export default function LogoutPage(){
     const navigate = useNavigate();

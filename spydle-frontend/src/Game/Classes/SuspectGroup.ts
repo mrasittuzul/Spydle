@@ -84,11 +84,11 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
         this.resultPip.setTint(new Phaser.Display.Color(isMatchFound ? 0 : 255, isMatchFound ? 255 : 0, 0).color);
     }
 
-    onPointerOver(pointer: Phaser.Input.Pointer){
+    onPointerOver(){
         this.scene.events.emit("suspectGroupHoverOn", this.suspectCodes);
     }
 
-    onPointerOut(pointer: Phaser.Input.Pointer, hoveredObjects: Phaser.GameObjects.GameObject[]){
+    onPointerOut(){
         this.scene.events.emit("suspectGroupHoverOut", this.suspectCodes);
     }
 

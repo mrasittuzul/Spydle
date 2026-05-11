@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Post } from "../Helpers/RequestHelper";
 import type { ApiErrorResponse } from "../Helpers/RequestHelper";
 
-import styles from '../styles/SignupPage.module.css';
+import styles from '../Styles/SignupPage.module.css';
 
 export default function SignupPage(){
 

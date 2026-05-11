@@ -89,7 +89,7 @@ export class Character extends Phaser.GameObjects.Container {
         this.outline.setTint(color.color);
     }
 
-    onClicked(pointer: Phaser.Input.Pointer){
+    onClicked(){
         this.scene.events.emit("onCharacterClicked", this);
     }
 
