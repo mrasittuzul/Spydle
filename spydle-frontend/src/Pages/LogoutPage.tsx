@@ -16,7 +16,7 @@ export default function LogoutPage(){
         return () => {
             clearTimeout(timer);
         };
-    })
+    });
 
     return(
         <div className={styles.page}>
