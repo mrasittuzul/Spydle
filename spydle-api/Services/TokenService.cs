@@ -37,7 +37,7 @@ namespace spydle_api.Services
             return Task.FromResult(new GenerateTokenResponse
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(jwt),
-                TokenExpireDate = dateTimeNow.Add(TimeSpan.FromMinutes(configuration.GetValue<long>("Jwt:ExpirationInMinutes")))
+                TokenExpireDateInMiliseconds = (long)jwt.ValidTo.Subtract(DateTime.UnixEpoch).TotalMilliseconds
             });
         }
     }

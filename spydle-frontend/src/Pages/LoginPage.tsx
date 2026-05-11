@@ -6,7 +6,7 @@ import { useAuthContext } from "../Contexts/AuthContext";
 
 import styles from '../styles/LoginPage.module.css';
 
-type ApiLoginResponse = { token: string, tokenExpireDate: string };
+type ApiLoginResponse = { token: string, tokenExpireDateInMiliseconds: number };
 
 export default function LoginPage(){
 
@@ -16,7 +16,6 @@ export default function LoginPage(){
     const navigate = useNavigate();
     const authContext = useAuthContext()
 
-    console.log(loginErrors);
     async function onLoginButtonClicked(){
         if (!emailRef.current || !passwordRef.current){
             console.error("Email or Password input field reference is null");
@@ -26,10 +25,10 @@ export default function LoginPage(){
         const email: string = emailRef.current.value;
         const password: string = passwordRef.current.value;
         const response = await Post<ApiLoginResponse>("Account/Login", { Email: email, Password: password });
-        if(response.status == 200){
+        if (response.status == 200){
             const loginResponse = response.data as ApiLoginResponse;
             localStorage.setItem("jwt", loginResponse.token);
-            localStorage.setItem("jwtExpireDate", loginResponse.tokenExpireDate);
+            localStorage.setItem("jwtExpireDate", loginResponse.tokenExpireDateInMiliseconds.toString());
             authContext.setIsAuthorized(true);
             navigate("/");
         } else{
