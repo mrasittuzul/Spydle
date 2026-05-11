@@ -31,6 +31,7 @@ export default function LoginPage(){
             localStorage.setItem("jwtExpireDate", loginResponse.tokenExpireDateInMiliseconds.toString());
             authContext.setIsAuthorized(true);
             navigate("/");
+            setTimeout(() => navigate("/Logout"), loginResponse.tokenExpireDateInMiliseconds - Date.now())
         } else{
             setLoginErrors((response.data as ApiErrorResponse).errors)
         }
