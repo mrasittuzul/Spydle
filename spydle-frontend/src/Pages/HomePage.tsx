@@ -6,7 +6,9 @@ import styles from "../styles/HomePage.module.css";
 export default function HomePage(){
     const authContext = useAuthContext();
     let playButton;
+    let divider;
     if(authContext.isAuthorized){
+        divider = <div className={styles.divider}></div>
         playButton = <Link to="/Game" className={styles.playButton}>Play</Link>;
     }
 
@@ -15,7 +17,7 @@ export default function HomePage(){
             <p className={styles.eyebrow}>A Daily Deduction Game</p>
             <h1 className={styles.title}>Spydle</h1>
             <p className={styles.subtitle}>Find The Spy</p>
-            <div className={styles.divider}></div>
+            { divider }
             { playButton }
         </div>
     )
