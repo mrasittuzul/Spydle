@@ -8,11 +8,13 @@ import LogoutPage from './Pages/LogoutPage';
 import RootPage from './Pages/RootPage';
 import GamePage from "./Pages/GamePage";
 import SignupPage from "./Pages/SignupPage";
+import ErrorPage from "./Pages/ErrorPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootPage/>,
+    errorElement: <ErrorPage/>,
     children: [
       {
         index: true,
