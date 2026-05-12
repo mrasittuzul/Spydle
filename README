@@ -10,7 +10,7 @@ Every player plays the same case each day.
 
 ## Architecture
 
-The project is a monorepo consisting of two services:
+The project is a monorepo consisting of a backend API and a frontend web app.
 
 ```
 spydle/
