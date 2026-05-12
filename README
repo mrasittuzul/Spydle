@@ -1,0 +1,70 @@
+# Spydle
+
+A daily deduction game inspired by Wordle. Every day a new case is generated — find the spy hidden among a crowd of characters by interrogating a limited number of suspects.
+
+## Gameplay
+
+A crowd of 64 procedurally generated characters is displayed. One of them is the spy. The player interrogates suspects and presents them to an off-screen informant, who answers yes or no depending on whether the selected character shares a trait with the spy. After a limited number of interrogations the player presents a final group of suspects — if the spy is among them, the mission succeeds.
+
+Every player plays the same case each day.
+
+## Architecture
+
+The project is a monorepo consisting of two services:
+
+```
+spydle/
+    spydle-api/           # ASP.NET Core Web API backend
+    spydle-frontend/      # React frontend
+    docker-compose.yml
+```
+
+### Backend — `spydle-api`
+
+Built with ASP.NET Core and Entity Framework Core targeting PostgreSQL.
+
+**Authentication** is handled by ASP.NET Core Identity with JWT bearer tokens. Endpoints that affect game state require an authenticated user.
+
+**Daily case generation** runs on demand when the first player requests the case for a given day. The case is generated using the date as a deterministic RNG seed. The spy's identity is stored server-side until they've run out of interrogations, at which point the spy is revealed.
+
+**Character encoding** uses a bitmask system where each character's traits are encoded as a single integer. Individual traits are isolated by applying named bitmasks, making trait comparison a simple bitwise AND operation. The same encoding is mirrored on the frontend for decoding characters into visual representations.
+
+**Game logic** is handled entirely server-side. The client sends arrays of character codes to the interrogation endpoint and receives a boolean response — the spy's identity is never exposed to the client until the game concludes.
+
+**Tech stack:**
+- ASP.NET Core 10
+- Entity Framework Core with Npgsql
+- ASP.NET Core Identity
+- JWT authentication
+- PostgreSQL
+
+### Frontend — `spydle-frontend`
+
+Built with React and TypeScript. The UI shell — navigation, authentication pages, layout — is handled by React with React Router. The game itself is rendered in a Phaser.js canvas embedded as a React component.
+
+**Character rendering** is procedural. Each character is assembled at runtime from layered sprite components — base body, eye sockets, eye&chest fill, age overlay and an outline — with tints applied based on decoded trait values. This allows 64 unique characters to be generated from a small set of reusable assets.
+
+**Tech stack:**
+- React 19
+- TypeScript
+- React Router
+- Phaser.js
+- Vite
+
+## Running Locally
+
+Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+Clone the repository then start all services:
+
+```bash
+docker-compose up --build
+```
+
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:3000 |
+| API      | http://localhost:8080 |
+| Database | localhost:5432 |
+
+The API applies database migrations automatically on startup.
