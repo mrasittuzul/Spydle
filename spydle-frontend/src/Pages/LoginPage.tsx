@@ -55,7 +55,7 @@ export default function LoginPage(){
                         <button className={styles.button} onClick={onLoginButtonClicked}>Enter</button>
                     </li>
                     <li className={styles.submitItem}>
-                        <Link to="/Signup" className={styles.signup} onClick={onLoginButtonClicked}>Don't have an account? Sign Up</Link>
+                        <Link to="/Signup" className={styles.signup}>Don't have an account? Sign Up</Link>
                     </li>
                 </ul>
                 {loginErrors && (
