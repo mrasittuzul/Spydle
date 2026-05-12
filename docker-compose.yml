@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: spydle-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./spydle-api
+      dockerfile: Dockerfile
+    container_name: spydle-api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__PostgreSQL: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    expose:
+      - "8080"
+    networks:
+      - backend
+      - frontend
+
+  frontend:
+    build:
+      context: ./spydle-frontend
+      dockerfile: Dockerfile
+    container_name: spydle-frontend
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+    networks:
+      - frontend
+
+volumes:
+  postgres-data:
+
+networks:
+  backend:
+  frontend:

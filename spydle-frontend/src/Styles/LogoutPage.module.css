@@ -1,0 +1,26 @@
+.page {
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--color-text);
+  font-style: italic;
+}
+
+.message {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+}
