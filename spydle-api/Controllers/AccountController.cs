@@ -30,17 +30,13 @@ namespace spydle_api.Controllers
                 return BadRequest(new ErrorContainer(ModelState.ToErrorCollection()));
             }
 
-            var findByEmailTask = _userManager.FindByEmailAsync(registerRequest.Email);
-            var findByNameTask = _userManager.FindByNameAsync(registerRequest.Username);
-            await Task.WhenAll(findByEmailTask, findByNameTask);
-
-            var userByEmail = findByEmailTask.Result;
+            var userByEmail = await _userManager.FindByEmailAsync(registerRequest.Email);
             if (userByEmail != null)
             {
                 return BadRequest(new ErrorContainer("A user with the same email address is already registered."));
             }
 
-            var userByName = findByNameTask.Result;
+            var userByName = await _userManager.FindByNameAsync(registerRequest.Username);
             if (userByName != null)
             {
                 return BadRequest(new ErrorContainer("A user with the same username is already registered."));
