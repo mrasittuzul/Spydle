@@ -1,4 +1,4 @@
-import { BASE_API_URL } from "../Constants";
+const BASE_API_URL = import.meta.env.VITE_API_URL;
 
 type ApiGenericResponse<T> = { status: number, data: T | ApiErrorResponse }
 export type ApiErrorResponse = { errors: string[]};

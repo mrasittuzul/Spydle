@@ -1,1 +1,0 @@
-export var BASE_API_URL: string = "https://localhost:7124/api/";

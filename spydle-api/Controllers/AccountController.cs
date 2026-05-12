@@ -30,25 +30,33 @@ namespace spydle_api.Controllers
                 return BadRequest(new ErrorContainer(ModelState.ToErrorCollection()));
             }
 
-            var user = await _userManager.FindByEmailAsync(registerRequest.Email);
-            if (user == null)
-            {
-                User registeringUser = new User
-                {
-                    Email = registerRequest.Email,
-                    UserName = registerRequest.Username
-                };
-                var result = await _userManager.CreateAsync(registeringUser, registerRequest.Password);
-                if (result.Succeeded)
-                {
-                    return Ok("Successfuly registered.");
-                }
-                return StatusCode(500, new ErrorContainer(result.Errors.Select(identityError => identityError.Description).ToArray()));
-            }
-            else
+            var findByEmailTask = _userManager.FindByEmailAsync(registerRequest.Email);
+            var findByNameTask = _userManager.FindByNameAsync(registerRequest.Username);
+            await Task.WhenAll(findByEmailTask, findByNameTask);
+
+            var userByEmail = findByEmailTask.Result;
+            if (userByEmail != null)
             {
                 return BadRequest(new ErrorContainer("A user with the same email address is already registered."));
             }
+
+            var userByName = findByNameTask.Result;
+            if (userByName != null)
+            {
+                return BadRequest(new ErrorContainer("A user with the same username is already registered."));
+            }
+
+            User registeringUser = new User
+            {
+                Email = registerRequest.Email,
+                UserName = registerRequest.Username
+            };
+            var result = await _userManager.CreateAsync(registeringUser, registerRequest.Password);
+            if (result.Succeeded)
+            {
+                return Ok("Successfuly registered.");
+            }
+            return StatusCode(500, new ErrorContainer(result.Errors.Select(identityError => identityError.Description).ToArray()));
         }
 
         [HttpPost("Login")]
