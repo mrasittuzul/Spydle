@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
 using spydle_api.DTOs;
 using spydle_api.Entities;
+using spydle_api.Interfaces;
 using spydle_api.Mappers;
 using spydle_api.Models;
 using spydle_api.Services;
@@ -16,10 +17,12 @@ namespace spydle_api.Controllers
     public class CharacterController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ITokenService _tokenService;
 
-        public CharacterController(ApplicationDbContext context)
+        public CharacterController(ApplicationDbContext context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
 
         [HttpGet("EyeColors")]
@@ -49,8 +52,7 @@ namespace spydle_api.Controllers
                 return BadRequest(new ErrorContainer("Today's case hasn't been generated yet."));
             }
 
-            string userId = HttpContext.User.Claims.First(c => c.Type == "userId").Value;
-            var user = await _context.Users.Include(u => u.Interrogations).FirstOrDefaultAsync(u => u.Id == userId);
+            User user = await _tokenService.GetUserFromHTTPContext(HttpContext);
             int interrogationCount = user.Interrogations.Where(i => i.CaseDate == CaseController.TodaysCase.Date).Count();
             if (interrogationCount == CaseController.TodaysCase.InterrogationCount)
             {
@@ -84,8 +86,7 @@ namespace spydle_api.Controllers
         [Authorize]
         public async Task<IActionResult> GetSpy()
         {
-            string userId = HttpContext.User.Claims.First(c => c.Type == "userId").Value;
-            var user = await _context.Users.Include(u => u.Interrogations).FirstOrDefaultAsync(u => u.Id == userId);
+            User user = await _tokenService.GetUserFromHTTPContext(HttpContext);
             int interrogationCount = user.Interrogations.Where(i => i.CaseDate == CaseController.TodaysCase.Date).Count();
             if (interrogationCount < CaseController.TodaysCase.InterrogationCount)
             {
