@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using spydle_api.Data;
@@ -47,6 +46,10 @@ namespace spydle_api.Controllers
         [Authorize]
         public async Task<IActionResult> CheckSuspectsForTraits([FromBody] SuspectsDTO suspectsDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ErrorContainer(ModelState.ToErrorCollection()));
+            }
             if(CaseController.TodaysCase == null)
             {
                 return BadRequest(new ErrorContainer("Today's case hasn't been generated yet."));
@@ -57,6 +60,11 @@ namespace spydle_api.Controllers
             if (interrogationCount == CaseController.TodaysCase.InterrogationCount)
             {
                 return BadRequest(new ErrorContainer("You don't have any interrogations left."));
+            }
+            if ((interrogationCount < CaseController.TodaysCase.InterrogationCount - 1 && suspectsDTO.SuspectCodes.Length > CaseController.TodaysCase.RegularInterrogationSuspectCount)
+                || (interrogationCount == CaseController.TodaysCase.InterrogationCount - 1 && suspectsDTO.SuspectCodes.Length > CaseController.TodaysCase.FinalInterrogationSuspectCount))
+            {
+                return BadRequest(new ErrorContainer("Interrogation violates allowed suspect count."));
             }
 
             bool isMatchingTraitFound = false;

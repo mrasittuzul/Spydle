@@ -43,7 +43,9 @@ namespace spydle_api.Controllers
                     TodaysCase = new Case
                     {
                         Date = DateTime.UtcNow.Date,
-                        InterrogationCount = 5,
+                        InterrogationCount = 6, // The interrogation count should be a minimum of 2: one for a regular interrogation and one for the final guess. Last interrogation is always the final guess.
+                        RegularInterrogationSuspectCount = 1,
+                        FinalInterrogationSuspectCount = 5,
                         RngSeed = rngSeed,
                         SpyCharacterCode = characters[random.Next(0, characters.Count)].Code,
                         IncludedCharacters = characters.Select(ch =>  ch.Code).ToArray()

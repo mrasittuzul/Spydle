@@ -1,10 +1,34 @@
 import * as Phaser from "phaser";
 import { Get } from "../../Helpers/RequestHelper";
 
+export type CaseData = {
+    interrogationCount: number, 
+    regularInterrogationSuspectCount: number,
+    finalInterrogationSuspectCount: number,
+    rngSeed: number, 
+    includedCharacters: number[],
+}
+
+export type InterrogationsForTodaysCase = {
+    interrogations: 
+    { 
+        dateTimeInMiliseconds: number, 
+        suspects: number[], 
+        foundMatchingTrait: boolean,
+    }[]
+}
+
+export type RGBColor = {
+    red: number,
+    green: number,
+    blue: number,
+}
+
 export type GameplayData = {
-    caseData: { interrogationCount: number, rngSeed: number, includedCharacters: number[]}
-    eyeColors: {red: number, green: number, blue: number}[]
-    skinColors: {red: number, green: number, blue: number}[]
+    caseData: CaseData,
+    interrogationsForTodaysCase: InterrogationsForTodaysCase,
+    eyeColors: RGBColor[],
+    skinColors: RGBColor[],
 }
 
 export default class PreloaderScene extends Phaser.Scene {
@@ -67,11 +91,15 @@ export default class PreloaderScene extends Phaser.Scene {
             const caseResponse = await Get("Case/Today");
             if (caseResponse.status !== 200) throw new Error("Failed to fetch case");
 
-            this.updateProgress(0.25, "Fetching eye colors...");
+            this.updateProgress(0.5, "Fetching case...");
+            const interrogationsResponse = await Get("Interrogation/GetInterrogationsForTodaysCase");
+            if (interrogationsResponse.status !== 200) throw new Error("Failed to fetch interrogations");
+
+            this.updateProgress(0.6, "Fetching eye colors...");
             const eyeColorsResponse = await Get("Character/EyeColors");
             if (eyeColorsResponse.status !== 200) throw new Error("Failed to fetch eye colors");
 
-            this.updateProgress(0.5, "Fetching skin colors...");
+            this.updateProgress(0.7, "Fetching skin colors...");
             const skinColorsResponse = await Get("Character/SkinColors");
             if (skinColorsResponse.status !== 200) throw new Error("Failed to fetch skin colors");
 
@@ -79,12 +107,13 @@ export default class PreloaderScene extends Phaser.Scene {
 
             // Small delay so the player sees 100% before transitioning
             //await new Promise(resolve => setTimeout(resolve, 500));
-
+            
             this.scene.start("GameplayScene", {
                 caseData: caseResponse.data,
+                interrogationsForTodaysCase: interrogationsResponse.data,
                 eyeColors: eyeColorsResponse.data,
                 skinColors: skinColorsResponse.data
-            });
+            } as GameplayData);
 
         } catch (error) {
             this.statusText.setText("");

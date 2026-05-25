@@ -1,5 +1,5 @@
 import * as Phaser from "phaser";
-import type { GameplayData } from "./PreloaderScene";
+import type { CaseData, InterrogationsForTodaysCase, RGBColor, GameplayData } from "./PreloaderScene";
 import { Character } from "../Classes/Character";
 import { Get, Post } from "../../Helpers/RequestHelper";
 
@@ -14,9 +14,10 @@ import white from '../../assets/GameAssets/white.png';
 import { SuspectGroup } from "../Classes/SuspectGroup";
 
 export default class GameplayScene extends Phaser.Scene {
-    caseData: { interrogationCount: number, rngSeed: number, includedCharacters: number[]} = {interrogationCount:5, rngSeed:0, includedCharacters:[]};
-    eyeColors: {red: number, green: number, blue: number}[] = [];
-    skinColors: {red: number, green: number, blue: number}[] = [];
+    caseData: CaseData = {interrogationCount:5, rngSeed:0, includedCharacters:[]};
+    interrogationsForTodaysCase: InterrogationsForTodaysCase = {interrogations:[]};
+    eyeColors: RGBColor[] = [];
+    skinColors: RGBColor[] = [];
     characters: Character[] = [];
     spyCharacter: Character = null!;
     spyFoundResultPip: Phaser.GameObjects.Image = null!;
@@ -39,6 +40,7 @@ export default class GameplayScene extends Phaser.Scene {
     init(data: GameplayData)
     {
         this.caseData = data.caseData;
+        this.interrogationsForTodaysCase = data.interrogationsForTodaysCase;
         this.eyeColors = data.eyeColors;
         this.skinColors = data.skinColors;
 
@@ -78,10 +80,14 @@ export default class GameplayScene extends Phaser.Scene {
             .setInteractive(new Phaser.Geom.Rectangle(0, 0, 1, 1),
                 Phaser.Geom.Rectangle.Contains)
             .on("pointerdown", this.onSubmitButtonClicked, this);
-        this.submitButtonText = this.add.text(175, 613 + 64/2, "0" + "/" + this.suspectGroups[0].capacity, {
+        this.submitButtonText = this.add.text(175, 613 + 64/2, "0" + "/" + this.suspectGroups[Math.min(this.performedInterrogationCount, this.caseData.interrogationCount - 1)].capacity, {
             fontSize: "18px",
             color: "#000000"
         }).setOrigin(0.5);
+
+        if (this.interrogationsForTodaysCase.interrogations.length == this.caseData.interrogationCount){
+            this.revealSpyCharacter();
+        }
     }
 
     private spawnCharacters() : void {
@@ -110,17 +116,24 @@ export default class GameplayScene extends Phaser.Scene {
     private spawnSuspectGroups() : void {
         const suspectGroupGap = 84;
         const startingPos = { x: 25, y: 25 };
-        const suspectGroupCount = this.caseData.interrogationCount + 1;
+        const suspectGroupCount = this.caseData.interrogationCount;
         const backgroundColor = new Phaser.Display.Color(44, 44, 44);
 
         for(let i = 0; i < suspectGroupCount; i++){
-            const suspectCountPerGroup = i === (suspectGroupCount - 1) ? 5 : 1;
+            const suspectCountPerGroup = i === (suspectGroupCount - 1) ? this.caseData.finalInterrogationSuspectCount : this.caseData.regularInterrogationSuspectCount;
             const suspectGroup = new SuspectGroup(this, i, suspectCountPerGroup, backgroundColor, startingPos.x, startingPos.y + suspectGroupGap * i);
             this.suspectGroups.push(suspectGroup);
         }
-
         this.suspectGroups[suspectGroupCount - 1].setTint(new Phaser.Display.Color(66, 66, 66)); // Final suspect group has a different color.
         this.suspectGroups[suspectGroupCount - 1].resultPip.setVisible(false); // Final suspect group doesn't need a resultPip because the result for that interrogation is shown on spyFoundResultPip
+
+        // Apply previous interrogations if there are any for today's case.
+        this.interrogationsForTodaysCase.interrogations.sort((a, b) => a.dateTimeInMiliseconds - b.dateTimeInMiliseconds); // Sort from oldest to newest
+        for(var i = 0; i < this.interrogationsForTodaysCase.interrogations.length; i++){
+            this.suspectGroups[i].setResult(this.interrogationsForTodaysCase.interrogations[i].foundMatchingTrait)
+            this.suspectGroups[i].setSuspects(this.interrogationsForTodaysCase.interrogations[i].suspects);
+        }
+        this.performedInterrogationCount = this.interrogationsForTodaysCase.interrogations.length;
     }
 
     private async onSubmitButtonClicked(){
@@ -134,11 +147,11 @@ export default class GameplayScene extends Phaser.Scene {
         }
 
         // In case the automatic spy character query fails and the user is asked to try again.
-        if (this.performedInterrogationCount < this.caseData.interrogationCount){
-            await this.interrogateSuspects();
+        if (this.performedInterrogationCount === this.caseData.interrogationCount){
+            await this.revealSpyCharacter();
         }
         else {
-            await this.revealSpyCharacter();
+            await this.interrogateSuspects();
         }
     }
 
@@ -157,8 +170,13 @@ export default class GameplayScene extends Phaser.Scene {
 
         var interrogationResponse = result.data as {isMatchFound: boolean, interrogationNumber: number};
         currentSuspectGroup.setResult(interrogationResponse.isMatchFound);
+        
         this.performedInterrogationCount = interrogationResponse.interrogationNumber;
-        this.updateSubmitButtonAppearance();
+        if (this.performedInterrogationCount === this.caseData.interrogationCount){
+            await this.revealSpyCharacter();
+        } else{
+            this.updateSubmitButtonAppearance();
+        }
     }
 
     private async revealSpyCharacter(){

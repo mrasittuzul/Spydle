@@ -8,6 +8,8 @@ namespace spydle_api.Models
         [Key]
         public DateTime Date { get; set; }
         public int InterrogationCount { get; set; }
+        public int RegularInterrogationSuspectCount { get; set; }
+        public int FinalInterrogationSuspectCount { get; set; }
         public int RngSeed { get; set; }
         public int SpyCharacterCode { get; set; }
         public int[] IncludedCharacters { get; set; } = null!;
