@@ -48,11 +48,11 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
         //this.scene.input.enableDebug(this, 0xffff00);
     }
 
-    setTint(color: Phaser.Display.Color){
+    public setTint(color: Phaser.Display.Color){
         this.background.setTint(color.color);
     }
 
-    toggleSuspect(suspect: Character) : void{
+    public toggleSuspect(suspect: Character) : void{
         var isSuspectInGroup: boolean = this.suspectCodes.find((s: number) => s === suspect.code) !== undefined;
         if(this.suspectCodes.length === this.capacity && !isSuspectInGroup){
             return;
@@ -67,6 +67,15 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
             this.suspectCodes.push(suspect.code);
         }
 
+        this.updateSuspectVisuals();
+        this.scene.events.emit("suspectToggled");
+    }
+
+    public setResult(isMatchFound: boolean){
+        this.resultPip.setTint(new Phaser.Display.Color(isMatchFound ? 0 : 255, isMatchFound ? 255 : 0, 0).color);
+    }
+
+    private updateSuspectVisuals(){
         this.characters.forEach((element, index) => {
             if(index < this.suspectCodes.length){
                 element.setCode(this.suspectCodes[index]);
@@ -76,23 +85,25 @@ export class SuspectGroup extends Phaser.GameObjects.Container{
                 element.setVisible(false);
             }
         });
-
-        this.scene.events.emit("suspectToggled");
     }
 
-    setResult(isMatchFound: boolean){
-        this.resultPip.setTint(new Phaser.Display.Color(isMatchFound ? 0 : 255, isMatchFound ? 255 : 0, 0).color);
+    public setSuspects(suspects: number[]){
+        if(suspects.length > this.capacity){
+            throw new Error("Suspect assignment to suspect group exceeds capacity.");
+        }
+        this.suspectCodes = suspects;
+        this.updateSuspectVisuals();
     }
 
-    onPointerOver(){
+    private onPointerOver(){
         this.scene.events.emit("suspectGroupHoverOn", this.suspectCodes);
     }
 
-    onPointerOut(){
+    private onPointerOut(){
         this.scene.events.emit("suspectGroupHoverOut", this.suspectCodes);
     }
 
-    onCharacterClicked(clickedCharacter: Character){
+    private onCharacterClicked(clickedCharacter: Character){
         if(this.scene.isGameOver || this.scene.isMakingRequest || this.scene.performedInterrogationCount !== this.groupIndex){
             return;
         }
